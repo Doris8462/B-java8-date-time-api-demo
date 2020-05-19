@@ -1,43 +1,42 @@
 package com.thoughtworks.capability.gtb.demo;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 /**
- * 脑洞会议系统v3.0
- * 读入的字符串是伦敦的本地时间
- * 输出的字符串是北京的本地时间
+ * ZonedDateTime 用法演示
  *
  * @author itutry
- * @create 2020-05-12_22:35
+ * @create 2020-05-19_17:32
  */
 public class ZonedDateTimeDemo {
 
   public static void main(String[] args) {
-    String timeStr = "2020-04-01 14:30:00";
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    LocalDateTime londonLocal = LocalDateTime.parse(timeStr, formatter);
+    // 创建巴黎所在的时区
+    ZoneId zoneId = ZoneId.of("Europe/Paris");
 
-    // 将读进来的本地时间转成带伦敦时区的时间
-    ZonedDateTime londonZoned = ZonedDateTime.of(londonLocal, ZoneId.of("Europe/London"));
+    // 获取系统默认时区
+    ZoneId defaultZoneId = ZoneId.systemDefault();
 
-    // 将伦敦时区的时间转成北京时区的时间
-    ZonedDateTime beijingZoned = londonZoned.withZoneSameInstant(ZoneId.systemDefault());
-    // 从北京时区的时间获取北京的本地时间
-    LocalDateTime meetingTime = beijingZoned.toLocalDateTime();
+    // 获取所有可用时区
+    Set<String> allZoneIds = ZoneId.getAvailableZoneIds();
+    allZoneIds.forEach(System.out::println);
 
-    LocalDateTime now = LocalDateTime.now();
-    if (now.isAfter(meetingTime)) {
-      LocalDateTime tomorrow = now.plusDays(1);
-      int newDayOfYear = tomorrow.getDayOfYear();
-      meetingTime = meetingTime.withDayOfYear(newDayOfYear);
+    LocalDateTime localDateTime = LocalDateTime.of(2015, Month.FEBRUARY, 20, 6, 30);
+    // 实例化 ZonedDateTime
+    ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, zoneId);
+    System.out.println(zonedDateTime);
 
-      String showTimeStr = formatter.format(meetingTime);
-      System.out.println(showTimeStr);
-    } else {
-      System.out.println("会议还没开始呢");
-    }
+    ZoneId otherZoneId = defaultZoneId;
+    // 转换成另一个时区的 ZonedDateTime
+    ZonedDateTime otherZonedDateTime = zonedDateTime.withZoneSameInstant(otherZoneId);
+    System.out.println(otherZonedDateTime);
+
+    // 转换成本地时间
+    LocalDateTime otherLocalDateTime = zonedDateTime.toLocalDateTime();
+    System.out.println(otherLocalDateTime);
   }
 }
